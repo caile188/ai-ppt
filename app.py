@@ -12,10 +12,10 @@ import gradio as gr
 OUTPUT_DIR = "static/output"
 
 
-def process_flow(topic):
+def process_flow(user_input):
     """完整处理流程"""
     # 生成Markdown
-    md_content = generate_markdown(topic)
+    md_content = generate_markdown(user_input)
 
     # 解析结构
     slides = parse_markdown(md_content)
@@ -29,11 +29,11 @@ def process_flow(topic):
 
 
 # Gradio界面
-with gr.Blocks(title="ChatPPT MVP") as demo:
-    gr.Markdown("## ChatPPT - AI PPT生成助手")
+with gr.Blocks(title="AiPPT") as demo:
+    gr.Markdown("## AiPPT - PPT生成助手")
 
     with gr.Row():
-        topic_input = gr.Textbox(label="输入主题", placeholder="请输入PPT主题...")
+        user_input = gr.Textbox(label="输入主题", placeholder="请输入PPT主题...")
         with gr.Column():
             md_output = gr.Code(label="生成内容", language="markdown")
             file_output = gr.File(label="下载PPT")
@@ -42,7 +42,7 @@ with gr.Blocks(title="ChatPPT MVP") as demo:
 
     submit_btn.click(
         fn=process_flow,
-        inputs=topic_input,
+        inputs=user_input,
         outputs=[md_output, file_output]
     )
 

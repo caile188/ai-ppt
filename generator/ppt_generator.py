@@ -33,8 +33,39 @@ def create_ppt(slides, output_path):
 
                 for item in slide_data['bullets']:
                     p = tf.add_paragraph()
-                    p.text = item
+                    p.level = item["level"]
+                    format_text(p, item["text"])  # 调用 format_text 方法来处理加粗文本
 
                 break
 
     prs.save(output_path)
+
+
+def format_text(paragraph, text):
+    """
+    格式化文本，处理加粗内容，** 包围的文本表示需要加粗。
+    """
+    while '**' in text:
+        start = text.find('**')
+        end = text.find('**', start + 2)
+
+        if start != -1 and end != -1:
+            # 添加加粗之前的普通文本
+            if start > 0:
+                run = paragraph.add_run()
+                run.text = text[:start]
+
+            # 添加加粗文本
+            bold_run = paragraph.add_run()
+            bold_run.text = text[start + 2:end]
+            bold_run.font.bold = True  # 设置加粗
+
+            # 处理剩余文本
+            text = text[end + 2:]
+        else:
+            break
+
+    # 添加剩余的普通文本
+    if text:
+        run = paragraph.add_run()
+        run.text = text
