@@ -72,11 +72,7 @@ with gr.Blocks(title="AiPPT") as demo:
                 fn=process_flow,  # 处理用户输入的函数
                 additional_inputs=[session_id],
                 chatbot=chatbot,  # 绑定的聊天机器人
-                type="messages",
-                examples=[
-                    ["生成AI科普PPT"],
-                    ["制作关于深度学习的教学PPT"]
-                ]
+                type="messages"
             )
 
             # 创建生成 PowerPoint 的按钮
