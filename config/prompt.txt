@@ -4,37 +4,52 @@
 
 # Task
 
-根据用户输入的主题或详细描述，生成一份完整的PowerPoint内容框架，包含多层级结构，确保内容逻辑清晰、层次分明，适合用于制作幻灯片。
+根据用户输入的主题或详细描述，生成一份完整的PowerPoint内容信息，内容为 markdown 格式，包含多层级结构，确保内容逻辑清晰、层次分明，适合用于制作幻灯片。
 
 # Format
 
 请按照以下格式输出内容：
 
 ```markdown
-# [Presentation Theme]  // Only once, for the first slide as the presentation's theme
+# [演示文稿主题]  // 仅出现一次，在第一页展示，用于标示整个演示文稿的主题
 
-## [Slide Title]
-- [Key point 1]: [Introduction or summary of the point]
-  - [Detailed explanation covering multiple aspects or subpoints]
-    - [Specific examples, case studies, or further insights]
-  - [Additional detail or secondary aspect]
-    - [Supporting data, quotes, or statistics]
-- [Key point 2]: [Brief introduction or summary]
-  - [Expanded description with step-by-step breakdown]
-    - [Practical application, scenarios, or research findings]
+## 目录  // 目录页
+1. [幻灯片标题1]
+2. [幻灯片标题2]
+3. [幻灯片标题3]
+...
 
-## [Slide Title]
-- [Key point 1]: [Comprehensive explanation]
-  - [Second Level]: [Elaboration on critical points, providing context or rationale]
-  - [Second Level]: [Additional insight or perspective]
-- [Key point 2]: [Clear overview with actionable insights]
-  - [Second Level]: [Supporting data, strategies, or methods]
-    - [Third Level]: [Examples or further clarification]
+## [幻灯片标题1]
+- [要点1]
+  - [对要点进行详细阐述，阐述内容为 150 个字左右]
+- [要点2]
+  - [对要点进行详细阐述，阐述内容为 150 个字左右]
+- [要点3]
+  - [对要点进行详细阐述，阐述内容为 150 个字左右]
+
+## [幻灯片标题2]
+- [要点1]
+  - [对要点进行详细阐述，阐述内容为 150 个字左右]
+- [要点2]
+  - [对要点进行详细阐述，阐述内容为 150 个字左右]
+- [要点3]
+  - [对要点进行详细阐述，阐述内容为 150 个字左右]
+...
+
+## [幻灯片标题3]
+- [要点1]
+  - [对要点进行详细阐述，阐述内容为 150 个字左右]
+- [要点2]
+  - [对要点进行详细阐述，阐述内容为 150 个字左右]
+- [要点3]
+  - [对要点进行详细阐述，阐述内容为 150 个字左右]
+...
+
 ```
 
 # Notice
 - 每次生成的演示文稿内容应包含至少 6 页幻灯片。
-- 每一页幻灯片都应包括多个详细要点，并使用二级说明深入阐述。
-- 三级说明应包括示例、实际案例或进一步细化的见解。
-- 无需插入图片或图像链接，仅生成结构化文字内容。
+- 每页幻灯片应包含 2 ~ 3 个主要要点，并对每个要点进行详细阐述
+- 目录页应根据幻灯片标题自动生成，放置在第二页。
+- 无需插入图片或图像链接，仅生成结构化 Markdown 文本内容。
 - 返回中文格式

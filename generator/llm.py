@@ -7,10 +7,10 @@ from langgraph.graph import StateGraph, START, END
 from operator import add
 from langchain_core.messages import BaseMessage
 from langchain_core.prompts import ChatPromptTemplate
-from langchain_openai import ChatOpenAI
 from langgraph.checkpoint.memory import MemorySaver
 from langgraph.prebuilt import ToolNode
 from langchain_community.tools.tavily_search import TavilySearchResults
+from langchain.chat_models import init_chat_model
 
 
 class AgentState(TypedDict):
@@ -39,11 +39,8 @@ def llm_node(state: AgentState):
     :param state:
     :return:
     """
-    chat_model = ChatOpenAI(
-        model="gpt-4o",
-        temperature=0.5,
-        max_tokens=4096
-    )
+
+    chat_model = init_chat_model("deepseek:deepseek-chat", temperature=0.5, max_tokens=4096)
 
     prompt = ChatPromptTemplate.from_messages(
         [

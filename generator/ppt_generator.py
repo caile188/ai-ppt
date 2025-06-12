@@ -6,33 +6,40 @@
 from pptx import Presentation
 
 
-TEMPLATE_PATH = "templates/default.pptx"
-
-
-def create_ppt(slides, output_path):
+def create_ppt(powerpoint_data, template_path, output_path):
     """根据解析结果生成PPTX文件"""
-    prs = Presentation(TEMPLATE_PATH)
+    prs = Presentation(template_path)
+    prs.core_properties.title = powerpoint_data.title  # 设置 PowerPoint 的核心标题
 
-    # 标题页
-    title_slide = prs.slides.add_slide(prs.slide_layouts[0])
-    title_slide.shapes.title.text = slides[0]['title']
+    for slide_data in powerpoint_data.slides:
+        slide_layout = prs.slide_layouts[slide_data.layout_id]
+        new_slide = prs.slides.add_slide(slide_layout)
 
-    # 内容页
-    for slide_data in slides[1:]:
-        slide = prs.slides.add_slide(prs.slide_layouts[1])
+        # 设置幻灯片标题
+        if new_slide.shapes.title:
+            if slide_data.content.title:
+                new_slide.shapes.title.text = slide_data.content.title
+            elif slide_data.content.closing:
+                new_slide.shapes.title.text = slide_data.content.closing
 
-        # 设置标题
-        title_box = slide.shapes.title
-        title_box.text = slide_data['title']
-
-        # 设置内容
-        for shape in slide.shapes:
-            if shape.has_text_frame and not shape == title_box:
+        # 设置文本内容
+        for shape in new_slide.shapes:
+            if shape.has_text_frame and not shape == new_slide.shapes.title:
                 tf = shape.text_frame
                 tf.clear()
+                first_paragraph = tf.paragraphs[0]
+                if slide_data.content.presenter_name:  # 设置主讲人
+                    first_paragraph.level = 0
+                    format_text(first_paragraph, slide_data.content.presenter_name)
 
-                for item in slide_data['bullets']:
-                    p = tf.add_paragraph()
+                for item in slide_data.content.agenda:  # 设置目录
+                    # 第一个要点覆盖初始段落，其他要点添加新段落
+                    p = first_paragraph if item == slide_data.content.agenda[0] else tf.add_paragraph()
+                    p.level = 0
+                    format_text(p, item)  # 调用 format_text 方法来处理加粗文本
+
+                for item in slide_data.content.bullet_points:  # 设置要点及详细阐述
+                    p = first_paragraph if item == slide_data.content.bullet_points[0] else tf.add_paragraph()
                     p.level = item["level"]
                     format_text(p, item["text"])  # 调用 format_text 方法来处理加粗文本
 

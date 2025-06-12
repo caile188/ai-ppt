@@ -5,12 +5,15 @@
 from generator.llm import build_graph
 from generator.markdown_parser import parse_markdown
 from generator.ppt_generator import create_ppt
+from generator.layout_manager import LayoutManager
+from pptx import Presentation
 from langchain_core.messages import HumanMessage
 import uuid
 import os
 import gradio as gr
 
 OUTPUT_DIR = "static/output"
+TEMPLATE_PATH = "templates/default.pptx"
 
 # 全局图对象（避免重复构建）
 GRAPH = build_graph()
@@ -41,11 +44,19 @@ def handle_generate(history):
     :return:
     """
     md_content = history[-1]["content"]
-    slides = parse_markdown(md_content)
+
+    prs = Presentation(TEMPLATE_PATH)
+    layout_mapping = {}
+    for idx, layout in enumerate(prs.slide_layouts):
+        layout_mapping[layout.name] = idx
+
+    # 解析 markdown，获取 powerpoint 格式信息
+    powerpoint_data = parse_markdown(md_content, LayoutManager(layout_mapping))
+
     # 生成PPT
     filename = f"{uuid.uuid4().hex[:6]}.pptx"
     output_path = os.path.join(OUTPUT_DIR, filename)
-    create_ppt(slides, output_path)
+    create_ppt(powerpoint_data, TEMPLATE_PATH, output_path)
     return output_path
 
 
