@@ -11,6 +11,8 @@ from langgraph.checkpoint.memory import MemorySaver
 from langgraph.prebuilt import ToolNode
 from langchain_community.tools.tavily_search import TavilySearchResults
 from langchain.chat_models import init_chat_model
+from config import setting
+from util.load_prompt import load_prompt
 
 
 class AgentState(TypedDict):
@@ -44,7 +46,7 @@ def llm_node(state: AgentState):
 
     prompt = ChatPromptTemplate.from_messages(
         [
-            ("system", load_prompt()),
+            ("system", load_prompt(setting.CHATBOT_PROMPT_PATH)),
             ("human", "{input}")
         ]
     )
@@ -96,14 +98,6 @@ def build_graph():
     graph = graph_builder.compile(checkpointer=MemorySaver())
 
     return graph
-
-
-def load_prompt():
-    """
-    从文件加载系统提示语。
-    """
-    with open("config/prompt.txt", "r", encoding="utf-8") as file:
-        return file.read().strip()
 
 
 
