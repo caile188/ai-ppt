@@ -11,6 +11,7 @@ import uuid
 import os
 
 from util.log_manager import log_manager
+from config import setting
 
 logger = log_manager.get_logger(__name__)
 logger.info("log test")
@@ -95,7 +96,9 @@ if __name__ == '__main__':
     # tt = "新能源汽车是指采用新型动力系统，完全或主要依靠电能或其他清洁能源驱动的汽车。随着全球对环境保护和能源安全的重视，新能源汽车逐渐成为汽车产业的重要发展方向。其核心目标是减少对传统化石燃料的依赖，降低碳排放，推动可持续发展。"
     # print(len(tt))
     item = {"title": "hello", "content": "word"}
-    print(item['title'])
+
+    model_list = list(setting.MODEL_LIST.keys())
+    print(model_list)
 
 
 

@@ -17,6 +17,10 @@ MODEL_LIST = {
   "deepseek-v3": {
     "model_provider": "deepseek",
     "model_name": "deepseek-chat"
+  },
+  "gpt-4o": {
+    "model_provider": "openai",
+    "model_name": "gpt-4o"
   }
 }
 

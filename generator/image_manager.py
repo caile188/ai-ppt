@@ -15,15 +15,17 @@ from io import BytesIO
 import requests
 import os
 import json
+import re
 
 
 class ImageManager:
 
-    def __init__(self, slide_content):
+    def __init__(self, slide_content, chat_model):
         self.logger = log_manager.get_logger(__name__)
         self.slide_content = slide_content
         self.prompt_file_path = setting.IMAGE_PROMPT_PATH
         self.output_image_dir = setting.IMAGE_OUTPUT_DIR
+        self.model_dict = setting.MODEL_LIST[chat_model]
 
     def get_slide_keywords(self):
         """
@@ -32,7 +34,11 @@ class ImageManager:
         :return:
         """
 
-        chat_model = init_chat_model("deepseek:deepseek-chat", temperature=0.5, max_tokens=4096)
+        chat_model = init_chat_model(
+            f"{self.model_dict['model_provider']}:{self.model_dict['model_name']}",
+            temperature=0.5,
+            max_tokens=4096
+        )
 
         prompt = ChatPromptTemplate(
             [
@@ -41,9 +47,14 @@ class ImageManager:
             ]
         )
 
-        chain = prompt | chat_model.with_structured_output(method="json_mode")
+
+        # 使用openai代理api，暂不支持此解析方式，改为手动解析
+        # chain = prompt | chat_model.with_structured_output(method="json_mode")
+
+        chain = prompt | chat_model
         response = chain.invoke({"input": self.slide_content})
-        return response
+        final_response = self.parser_output(response.content)
+        return final_response
 
     def configure_images(self):
         """
@@ -223,3 +234,18 @@ class ImageManager:
         # 将修改后的内容重新组合为字符串
         new_content = '\n'.join(new_lines)
         return new_content
+
+    def parser_output(self, content):
+        self.logger.info(f"[模型生成slide及其关键字为：] {content}")
+
+        # --- START: 添加 JSON 提取和解析逻辑 ---
+        json_string_match = re.search(r"```json\s*(\{.*\})\s*```", content, re.DOTALL)
+
+        if json_string_match:
+            extracted_json_content = json_string_match.group(1)
+            final_response = json.loads(extracted_json_content)
+        else:
+            # 如果没有匹配到 ```json 块，尝试直接解析整个 content
+            final_response = json.loads(content)
+
+        return final_response

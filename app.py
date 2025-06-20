@@ -18,12 +18,15 @@ import gradio as gr
 GRAPH = build_graph()
 
 
-def process_flow(user_input, history, session_id: str):
+def process_flow(user_input, history, chat_model, session_id: str):
     """完整处理流程"""
 
     # 生成Markdown
     result = GRAPH.invoke(
-        {"messages": [HumanMessage(content=user_input)]},
+        {
+            "messages": [HumanMessage(content=user_input)],
+            "chat_model": chat_model
+        },
         config={
             "configurable": {
                 "thread_id": f"thread_{session_id}"
@@ -36,7 +39,7 @@ def process_flow(user_input, history, session_id: str):
     return md_content
 
 
-def handle_generate(history, image_flag):
+def handle_generate(history, image_flag, chat_model):
     """
     生成ppt
     :param history:
@@ -44,7 +47,7 @@ def handle_generate(history, image_flag):
     """
     md_content = history[-1]["content"]
     if image_flag:
-        image_manger_obj = ImageManager(md_content)
+        image_manger_obj = ImageManager(md_content, chat_model)
         md_content = image_manger_obj.configure_images()
 
     prs = Presentation(setting.TEMPLATE_PATH)
@@ -82,13 +85,14 @@ with gr.Blocks(title="AiPPT") as demo:
                 height=500,
                 type="messages",
             )
+            model_list = list(setting.MODEL_LIST.keys())
+            chat_model = gr.Dropdown(choices=model_list, label="切换大模型")
             gr.ChatInterface(
                 fn=process_flow,  # 处理用户输入的函数
-                additional_inputs=[session_id],
                 chatbot=chatbot,  # 绑定的聊天机器人
+                additional_inputs=[chat_model, session_id],
                 type="messages"
             )
-            # chat_model = gr.Dropdown(choices=["deepseek:v3", "gpt-4o"], label="切换大模型")
 
         with gr.Column(scale=1):
             image_flag = gr.Checkbox(label="是否智能配图？")
@@ -96,7 +100,7 @@ with gr.Blocks(title="AiPPT") as demo:
             # 监听生成按钮的点击事件
             generate_btn.click(
                 fn=handle_generate,  # 点击时执行的函数
-                inputs=[chatbot, image_flag],  # 输入为聊天记录
+                inputs=[chatbot, image_flag, chat_model],  # 输入为聊天记录
                 outputs=gr.File(label="文件下载")  # 输出为文件下载链接
             )
 

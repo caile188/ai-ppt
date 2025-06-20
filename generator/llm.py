@@ -20,6 +20,7 @@ class AgentState(TypedDict):
     定义状态结构
     """
     messages: Annotated[Sequence[BaseMessage], add]
+    chat_model: str
 
 
 class ToolManager:
@@ -42,7 +43,12 @@ def llm_node(state: AgentState):
     :return:
     """
 
-    chat_model = init_chat_model("deepseek:deepseek-chat", temperature=0.5, max_tokens=4096)
+    model_dict = setting.MODEL_LIST[state['chat_model']]
+    model_obj = init_chat_model(
+        f"{model_dict['model_provider']}:{model_dict['model_name']}",
+        temperature=0.5,
+        max_tokens=4096
+    )
 
     prompt = ChatPromptTemplate.from_messages(
         [
@@ -53,7 +59,7 @@ def llm_node(state: AgentState):
 
     tools = ToolManager.get_tools()
 
-    chain = prompt | chat_model.bind_tools(tools)
+    chain = prompt | model_obj.bind_tools(tools)
     response = chain.invoke(state["messages"])
     return {"messages": [response]}
 
