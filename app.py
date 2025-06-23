@@ -21,22 +21,28 @@ GRAPH = build_graph()
 def process_flow(user_input, history, chat_model, session_id: str):
     """完整处理流程"""
 
+    full_response_content = ""
+
     # 生成Markdown
-    result = GRAPH.invoke(
+    for chunk, metadata in GRAPH.stream(
         {
             "messages": [HumanMessage(content=user_input)],
             "chat_model": chat_model
         },
+        stream_mode="messages",
         config={
             "configurable": {
                 "thread_id": f"thread_{session_id}"
             }
         }
-    )
-    # 提取最新生成的 AI 消息内容
-    md_content = result["messages"][-1].content
+    ):
+        # 提取最新生成的 AI 消息内容
+        if chunk.content:
+            full_response_content += chunk.content
+            yield full_response_content
 
-    return md_content
+        # md_content = result["messages"][-1].content
+        # return md_content
 
 
 def handle_generate(history, image_flag, chat_model):
