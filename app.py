@@ -87,7 +87,7 @@ with gr.Blocks(title="AiPPT") as demo:
 
             # 创建聊天机器人
             chatbot = gr.Chatbot(
-                placeholder="AI 一键生成 PPT：请输入主题或详细描述",
+                placeholder="AI 一键生成 PPT：请输入主题或详细描述，支持多轮对话",
                 height=500,
                 type="messages",
             )
